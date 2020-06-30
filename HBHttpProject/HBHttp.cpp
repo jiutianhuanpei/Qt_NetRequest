@@ -8,12 +8,14 @@ HBHttp::HBHttp(QObject *parent) : QObject(parent)
 {
     m_manager = new QNetworkAccessManager;
 
+    //注册类型，用于 signal/slot 间的参数传递
     qRegisterMetaType<callback>("callback");
-//    qRegisterMetaType<QUrlQuery>("QUrlQuery");
+    qRegisterMetaType<QUrlQuery>("QUrlQuery");
 
 
     connect(this, &HBHttp::signal_HB_get, this, &HBHttp::_HB_get);
 
+    //基础调用时打开
 //    connect(m_manager, &QNetworkAccessManager::finished, [=](QNetworkReply *reply) {
 
 //        QString response = reply->readAll();
@@ -64,6 +66,7 @@ void HBHttp::_HB_get(QString urlStr, QUrlQuery param, callback func)
     QNetworkRequest request(url);
     QNetworkReply *reply = m_manager->get(request);
 
+    //对 reply 添加信号监听，以便于一对一数据返回
     connect(reply, &QNetworkReply::finished, [&, reply, func] {
 
         QString response = reply->readAll();
